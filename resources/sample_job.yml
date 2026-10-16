@@ -1,0 +1,17 @@
+resources:
+  jobs:
+    sample_job:
+      name: sample_dbc_project_job
+
+      tasks:
+        - task_key: hello_task
+
+          spark_python_task:
+            python_file: ../src/job_hello.py
+
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
