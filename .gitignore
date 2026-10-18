@@ -1,4 +1,5 @@
-﻿.venv/
+﻿docs/
+.venv/
 .databricks/
 __pycache__/
 *.pyc
