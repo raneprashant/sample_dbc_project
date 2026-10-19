@@ -16,14 +16,26 @@ targets:
       host: https://dbc-536d8077-bb93.cloud.databricks.com
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
 
+  test:
+    mode: production
+    presets:
+      name_prefix: "[test] "
+    workspace:
+      host: https://dbc-536d8077-bb93.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+
+  prod:
+    mode: production
+    presets:
+      name_prefix: "[prod] "
+    workspace:
+      host: https://dbc-536d8077-bb93.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+
 sync:
   exclude:
     - .venv/
     - .databricks/
     - .vscode/
+    - docs/
 
-  ## Optionally, there could be 'staging' or 'prod' targets here.
-  #
-  # prod:
-  #   workspace:
-  #     host: https://dbc-536d8077-bb93.cloud.databricks.com
