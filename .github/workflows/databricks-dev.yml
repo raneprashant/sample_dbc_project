@@ -1,0 +1,14 @@
+name: Databricks Dev CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  validate-workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Confirm GitHub Actions runner
+        run: echo "GitHub Actions workflow is running for a PR to develop."
