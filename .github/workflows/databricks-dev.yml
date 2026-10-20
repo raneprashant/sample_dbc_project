@@ -18,6 +18,13 @@ jobs:
           pwd
           ls -la
           test -f databricks.yml
+      
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks CLI
+        run: databricks version
+          
     
       - name: Confirm GitHub Actions runner
         run: echo "GitHub Actions workflow is running for a PR to develop."
