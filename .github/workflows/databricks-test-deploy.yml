@@ -1,9 +1,12 @@
 name: Databricks Test Deployment
 
 on:
-  push:
-    branches:
-      - release
+  workflow_dispatch:
+  
+#on:
+#  push:
+#    branches:
+#      - release
 
 jobs:
   deploy-test:

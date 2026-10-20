@@ -1,0 +1,99 @@
+name: Databricks Refactored CD
+
+on:
+  push:
+    branches:
+      - develop
+      - release
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+
+  resolve-target:
+    runs-on: ubuntu-latest
+
+    outputs:
+      environment_name: ${{ steps.map-target.outputs.environment_name }}
+      bundle_target: ${{ steps.map-target.outputs.bundle_target }}
+      stage_name: ${{ steps.map-target.outputs.stage_name }}
+
+    steps:
+      - name: Resolve deployment target
+        id: map-target
+        run: |
+          case "${GITHUB_REF_NAME}" in
+
+            develop)
+              echo "environment_name=dev" >> "$GITHUB_OUTPUT"
+              echo "bundle_target=dev" >> "$GITHUB_OUTPUT"
+              echo "stage_name=DEV" >> "$GITHUB_OUTPUT"
+              ;;
+
+            release)
+              echo "environment_name=test" >> "$GITHUB_OUTPUT"
+              echo "bundle_target=test" >> "$GITHUB_OUTPUT"
+              echo "stage_name=TEST" >> "$GITHUB_OUTPUT"
+              ;;
+
+            main)
+              echo "environment_name=prod" >> "$GITHUB_OUTPUT"
+              echo "bundle_target=prod" >> "$GITHUB_OUTPUT"
+              echo "stage_name=PROD" >> "$GITHUB_OUTPUT"
+              ;;
+
+            *)
+              echo "Unsupported branch: ${GITHUB_REF_NAME}"
+              exit 1
+              ;;
+
+          esac
+
+  deploy:
+    needs: resolve-target
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ needs.resolve-target.outputs.environment_name }}
+
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DAB_TARGET: ${{ needs.resolve-target.outputs.bundle_target }}
+      DEPLOYMENT_STAGE: ${{ needs.resolve-target.outputs.stage_name }}
+
+    steps:
+
+      - name: Show deployment context
+        run: |
+          echo "Git branch: ${GITHUB_REF_NAME}"
+          echo "Deployment stage: ${DEPLOYMENT_STAGE}"
+          echo "Databricks bundle target: ${DAB_TARGET}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks authentication
+        run: |
+          databricks current-user me > /dev/null
+          echo "Databricks authentication succeeded."
+
+      - name: Validate Databricks bundle
+        run: |
+          databricks bundle validate --target "${DAB_TARGET}" > /dev/null
+          echo "${DEPLOYMENT_STAGE} bundle validation succeeded."
+
+      - name: Plan Databricks deployment
+        run: databricks bundle plan --target "${DAB_TARGET}"
+
+      - name: Deploy Databricks bundle
+        run: databricks bundle deploy --target "${DAB_TARGET}"
+
+      - name: Run Databricks job
+        run: databricks bundle run --target "${DAB_TARGET}" sample_job

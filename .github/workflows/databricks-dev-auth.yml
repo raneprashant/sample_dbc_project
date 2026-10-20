@@ -1,9 +1,12 @@
 name: Databricks Dev Deployment
 
 on:
-  push:
-    branches:
-      - develop
+  workflow_dispatch:
+  
+#on:
+#  push:
+#    branches:
+#      - develop
 
 jobs:
   authenticate-dev:
