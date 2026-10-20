@@ -10,5 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+    
+      - name: Verify Databricks project files
+        run: |
+          pwd
+          ls -la
+          test -f databricks.yml
+    
       - name: Confirm GitHub Actions runner
         run: echo "GitHub Actions workflow is running for a PR to develop."
