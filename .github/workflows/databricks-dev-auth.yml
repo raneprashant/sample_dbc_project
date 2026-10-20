@@ -25,3 +25,8 @@ jobs:
         run: |
           databricks current-user me > /dev/null
           echo "Databricks authentication succeeded."
+
+      - name: Validate Databricks DEV bundle
+        run: |
+          databricks bundle validate --target dev > /dev/null
+          echo "Databricks DEV bundle validation succeeded."
