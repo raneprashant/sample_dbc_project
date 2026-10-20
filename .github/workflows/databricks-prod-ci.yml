@@ -1,9 +1,12 @@
 name: Databricks Prod CI
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+
+#on:
+#  pull_request:
+#    branches:
+#      - main
 
 jobs:
   validate-prod-promotion:
