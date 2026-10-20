@@ -1,4 +1,4 @@
-name: Databricks Dev Authentication
+name: Databricks Dev Deployment
 
 on:
   push:
@@ -30,3 +30,12 @@ jobs:
         run: |
           databricks bundle validate --target dev > /dev/null
           echo "Databricks DEV bundle validation succeeded."
+
+      - name: Plan Databricks DEV deployment
+        run: databricks bundle plan --target dev
+
+      - name: Deploy Databricks DEV bundle
+        run: databricks bundle deploy --target dev
+
+      - name: Run Databricks DEV job
+        run: databricks bundle run --target dev sample_job
