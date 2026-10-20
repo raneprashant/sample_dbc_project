@@ -1,0 +1,27 @@
+name: Databricks Dev Authentication
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  authenticate-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks authentication
+        run: |
+          databricks current-user me > /dev/null
+          echo "Databricks authentication succeeded."
