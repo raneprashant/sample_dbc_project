@@ -1,0 +1,59 @@
+name: Databricks Refactored CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - release
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-promotion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve promotion stage
+        run: |
+          case "${{ github.base_ref }}" in
+            develop)
+              echo "DEPLOYMENT_STAGE=DEV" >> "$GITHUB_ENV"
+              ;;
+            release)
+              echo "DEPLOYMENT_STAGE=TEST" >> "$GITHUB_ENV"
+              ;;
+            main)
+              echo "DEPLOYMENT_STAGE=PROD" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "Unsupported target branch: ${{ github.base_ref }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Show CI context
+        run: |
+          echo "Source branch: ${{ github.head_ref }}"
+          echo "Target branch: ${{ github.base_ref }}"
+          echo "Logical stage: $DEPLOYMENT_STAGE"
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Verify Databricks project files
+        run: |
+          pwd
+          ls -la
+          test -f databricks.yml
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks CLI
+        run: databricks version
+
+      - name: Confirm CI validation
+        run: |
+          echo "$DEPLOYMENT_STAGE CI validation completed successfully."
