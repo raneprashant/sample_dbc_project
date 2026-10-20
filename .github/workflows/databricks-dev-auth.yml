@@ -1,0 +1,41 @@
+name: Databricks Dev Deployment
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  authenticate-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify Databricks authentication
+        run: |
+          databricks current-user me > /dev/null
+          echo "Databricks authentication succeeded."
+
+      - name: Validate Databricks DEV bundle
+        run: |
+          databricks bundle validate --target dev > /dev/null
+          echo "Databricks DEV bundle validation succeeded."
+
+      - name: Plan Databricks DEV deployment
+        run: databricks bundle plan --target dev
+
+      - name: Deploy Databricks DEV bundle
+        run: databricks bundle deploy --target dev
+
+      - name: Run Databricks DEV job
+        run: databricks bundle run --target dev sample_job
